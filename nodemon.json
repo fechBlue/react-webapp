@@ -1,0 +1,11 @@
+{
+  "restartable": "rs",
+  "ignore": [
+    ".git",
+    ".idea",
+    "build",
+    "client",
+    "node_modules/**/node_modules",
+    ".eslintrc"
+  ]
+}

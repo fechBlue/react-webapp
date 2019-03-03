@@ -1,4 +1,4 @@
 import React from 'react'
-import App from './App.jsx'
+import Routers from './config/router'
 
-export default <App />
+export default <Routers />

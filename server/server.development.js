@@ -12,7 +12,7 @@ const getTemplate = () => {
       .then(res => {
         resolve(res.data)
       })
-      .catch(() => {reject})
+      .catch(() => reject)
   })
 }
 
@@ -25,24 +25,22 @@ const getModuleFromString = (bundle, filename) => {
   const wrapper = NativeModule.wrap(bundle)
   const script = new vm.Script(wrapper, {
     filename: filename,
-    displayErrors: true,
+    displayErrors: true
   })
   const result = script.runInThisContext()
   result.call(m.exports, m.exports, require, m)
   return m
 }
-
-
 let serverBundle
-const mfs = new MemoryFs
+const mfs = new MemoryFs()
 const serverCompiler = webpack(serverWebpackConfig)
 serverCompiler.outputFileSystem = mfs
 
 serverCompiler.watch({}, (err, stats) => {
   if (err) throw err
   stats = stats.toJson()
-  stats.errors.forEach((err) => {console.error(err)})
-  stats.warnings.forEach((warn) =>{console.warn(warn)})
+  stats.errors.forEach((err) => { console.error(err) })
+  stats.warnings.forEach((warn) => { console.warn(warn) })
 
   const bundlePath = path.join(
     serverWebpackConfig.output.path,
@@ -53,7 +51,6 @@ serverCompiler.watch({}, (err, stats) => {
 })
 
 module.exports = function (app) {
-
   app.use('/public', proxy({
     target: 'http://localhost:8888'
   }))

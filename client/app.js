@@ -1,23 +1,27 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { Provider } from 'mobx-react'
 import { AppContainer } from 'react-hot-loader' //eslint-disable-line
-import App from './App.jsx'
+import Routers from './config/router'
+import appState from './store/app.state'
 
 const root = document.getElementById('root')
 
 const render = (Component) => {
   ReactDOM.render(
     <AppContainer>
-      <Component />
+      <Provider appState={appState}>
+        <Component />
+      </Provider>
     </AppContainer>,
-    root
+    root,
   )
 };
-render(App)
+render(Routers)
 
 if (module.hot) {
-  module.hot.accept('./App.jsx', () => {
-    const NextApp = require('./App.jsx').default; //eslint-disable-line
+  module.hot.accept('./config/router.js', () => {
+    const NextApp = require('./config/router.js').default; //eslint-disable-line
     render(NextApp);
   })
 }
