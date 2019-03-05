@@ -1,4 +1,5 @@
 const axios = require('axios')
+const querystring = require('query-string')
 
 const baseUrl = 'https://cnodejs.org/api/v1'
 
@@ -8,26 +9,22 @@ module.exports = function (req, res, next) {
   const user = req.session.user || {}
   const needAccessToken = req.query.needAccessToken
 
-  if (needAccessToken && user.accessToken) {
+  if (needAccessToken && !user.accessToken) {
     res.status(401).send({
       success: false,
       msg: 'need login'
     })
   }
 
-  const query = Object.assign({}, req.query)
-
-  if (query.needAccessToken) delete query.needAccessToken
-
   axios({
     url: `${baseUrl}${path}`,
     method: method,
-    params: query,
-    data: Object.assign({}, req.body, {
+    params: req.query,
+    data: querystring.stringify(Object.assign({}, req.body, {
       accesstoken: user.accessToken
-    }),
+    })),
     headers: {
-      'Content-Type': 'application/x-www-form-urlencode'
+      'Content-Type': 'application/x-www-form-urlencoded'
     }
   })
     .then((response) => {
@@ -39,7 +36,7 @@ module.exports = function (req, res, next) {
     })
     .catch((err) => {
       if (err.response) {
-        res.status(500).send(err.response)
+        res.status(500).send(err.response.data)
       } else {
         res.status(500).send({
           success: false,

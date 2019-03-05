@@ -23,7 +23,7 @@ router.post('/login', function (req, res, next) {
     })
     .catch((err) => {
       if (err.response) {
-        res.send(err.response)
+        res.status(403).send(err.response.data)
       } else {
         next(err)
       }

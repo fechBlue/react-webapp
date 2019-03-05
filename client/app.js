@@ -1,17 +1,20 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { BrowserRouter } from 'react-router-dom'
 import { Provider } from 'mobx-react'
 import { AppContainer } from 'react-hot-loader' //eslint-disable-line
 import Routers from './config/router'
-import appState from './store/app.state'
+import Appstate from './store/app.state'
 
 const root = document.getElementById('root')
 
 const render = (Component) => {
   ReactDOM.render(
     <AppContainer>
-      <Provider appState={appState}>
-        <Component />
+      <Provider appState={new Appstate()}>
+        <BrowserRouter>
+          <Component />
+        </BrowserRouter>
       </Provider>
     </AppContainer>,
     root,

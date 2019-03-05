@@ -31,7 +31,7 @@ const getModuleFromString = (bundle, filename) => {
   result.call(m.exports, m.exports, require, m)
   return m
 }
-let serverBundle
+let serverBundle, createStoreMap
 const mfs = new MemoryFs()
 const serverCompiler = webpack(serverWebpackConfig)
 serverCompiler.outputFileSystem = mfs
@@ -48,6 +48,7 @@ serverCompiler.watch({}, (err, stats) => {
   )
   const bundleFile = mfs.readFileSync(bundlePath, 'utf-8')
   serverBundle = getModuleFromString(bundleFile, 'server.entry.js').exports.default
+  createStoreMap = getModuleFromString(bundleFile, 'server.entry.js').exports.createStoreMap
 })
 
 module.exports = function (app) {
@@ -57,7 +58,16 @@ module.exports = function (app) {
 
   app.get('*', function (req, res) {
     getTemplate().then(template => {
-      const content = ReactSSR.renderToString(serverBundle);
+      const routerContext = {}
+      const stores = createStoreMap()
+      const ReactApp = serverBundle(stores, routerContext, req.url)
+      const content = ReactSSR.renderToString(ReactApp)
+      console.log(routerContext)
+      if (routerContext.url) {
+        res.status(302).setHeader('Location', routerContext.url)
+        res.end()
+        return
+      }
       res.send(template.replace('<app></app>', content))
     })
   })
