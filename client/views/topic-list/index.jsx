@@ -16,6 +16,15 @@ class TopicList extends Component {
     this.props.appState.changeName(event.target.value)
   }
 
+  bootstrap = () => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        this.props.appState.count = 3
+        resolve(true)
+      })
+    })
+  }
+
   render() {
     const { appState } = this.props
 

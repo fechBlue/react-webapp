@@ -1,14 +1,24 @@
 const axios = require('axios')
 const webpack = require('webpack')
+const ejs = require('ejs')
+const serialize = require('serialize-javascript')
 const path = require('path')
 const MemoryFs = require('memory-fs')
+const asyncBootstrap = require('react-async-bootstrapper')
 const proxy = require('http-proxy-middleware')
 const serverWebpackConfig = require('../build/webpack.config.server')
 const ReactSSR = require('react-dom/server')
 
+const getStoreState = (stores) => {
+  return Object.keys(stores).reduce((result, storeName) => {
+    result[storeName] = stores[storeName]
+    return result
+  }, {})
+}
+
 const getTemplate = () => {
   return new Promise((resolve, reject) => {
-    axios.get('http://localhost:8888/public/index.html')
+    axios.get('http://localhost:8888/public/server.ejs')
       .then(res => {
         resolve(res.data)
       })
@@ -57,18 +67,33 @@ module.exports = function (app) {
   }))
 
   app.get('*', function (req, res) {
-    getTemplate().then(template => {
-      const routerContext = {}
-      const stores = createStoreMap()
-      const ReactApp = serverBundle(stores, routerContext, req.url)
-      const content = ReactSSR.renderToString(ReactApp)
-      console.log(routerContext)
-      if (routerContext.url) {
-        res.status(302).setHeader('Location', routerContext.url)
-        res.end()
-        return
-      }
-      res.send(template.replace('<app></app>', content))
-    })
+    getTemplate()
+      .then(template => {
+        const routerContext = {}
+        const stores = createStoreMap()
+        const ReactApp = serverBundle(stores, routerContext, req.url)
+        asyncBootstrap(ReactApp)
+          .then(() => {
+            const states = getStoreState(stores)
+            if (routerContext.url) {
+              res.status(302).setHeader('Location', routerContext.url)
+              res.end()
+              return
+            }
+            const content = ReactSSR.renderToString(ReactApp)
+            const html = ejs.render(template, {
+              appString: content,
+              initialState: serialize(states)
+            })
+            console.log(html)
+            res.send(html)
+          })
+          .catch(err => {
+            console.error(err)
+          })
+      })
+      .catch(err => {
+        console.error(err)
+      })
   })
 }
