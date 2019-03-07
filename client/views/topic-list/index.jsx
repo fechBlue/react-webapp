@@ -3,6 +3,7 @@ import {
   observer,
   inject,
 } from 'mobx-react'
+import { Helmet } from 'react-helmet'
 import PropType from 'prop-types'
 import AppState from '../../store/app.state'
 
@@ -30,6 +31,10 @@ class TopicList extends Component {
 
     return (
       <div>
+        <Helmet>
+          <title>this is a topiclist page.</title>
+          <meta name="topicList" description="666" />
+        </Helmet>
         <input type="text" onChange={this.changeName} />
         {appState.msg}
       </div>

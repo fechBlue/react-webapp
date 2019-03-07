@@ -5,6 +5,7 @@ const serialize = require('serialize-javascript')
 const path = require('path')
 const MemoryFs = require('memory-fs')
 const asyncBootstrap = require('react-async-bootstrapper')
+const Helmet = require('react-helmet').default
 const proxy = require('http-proxy-middleware')
 const serverWebpackConfig = require('../build/webpack.config.server')
 const ReactSSR = require('react-dom/server')
@@ -80,12 +81,16 @@ module.exports = function (app) {
               res.end()
               return
             }
+            const helmet = Helmet.rewind()
             const content = ReactSSR.renderToString(ReactApp)
             const html = ejs.render(template, {
               appString: content,
-              initialState: serialize(states)
+              initialState: serialize(states),
+              title: helmet.title.toString(),
+              meta: helmet.meta.toString(),
+              style: helmet.style.toString(),
+              link: helmet.link.toString()
             })
-            console.log(html)
             res.send(html)
           })
           .catch(err => {
