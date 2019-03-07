@@ -1,21 +1,10 @@
 const axios = require('axios')
 const webpack = require('webpack')
-const ejs = require('ejs')
-const serialize = require('serialize-javascript')
 const path = require('path')
 const MemoryFs = require('memory-fs')
-const asyncBootstrap = require('react-async-bootstrapper')
-const Helmet = require('react-helmet').default
 const proxy = require('http-proxy-middleware')
 const serverWebpackConfig = require('../build/webpack.config.server')
-const ReactSSR = require('react-dom/server')
-
-const getStoreState = (stores) => {
-  return Object.keys(stores).reduce((result, storeName) => {
-    result[storeName] = stores[storeName]
-    return result
-  }, {})
-}
+const serverRender = require('./utils/server.render')
 
 const getTemplate = () => {
   return new Promise((resolve, reject) => {
@@ -42,7 +31,7 @@ const getModuleFromString = (bundle, filename) => {
   result.call(m.exports, m.exports, require, m)
   return m
 }
-let serverBundle, createStoreMap
+let serverBundle
 const mfs = new MemoryFs()
 const serverCompiler = webpack(serverWebpackConfig)
 serverCompiler.outputFileSystem = mfs
@@ -58,8 +47,7 @@ serverCompiler.watch({}, (err, stats) => {
     serverWebpackConfig.output.filename
   )
   const bundleFile = mfs.readFileSync(bundlePath, 'utf-8')
-  serverBundle = getModuleFromString(bundleFile, 'server.entry.js').exports.default
-  createStoreMap = getModuleFromString(bundleFile, 'server.entry.js').exports.createStoreMap
+  serverBundle = getModuleFromString(bundleFile, 'server.entry.js').exports
 })
 
 module.exports = function (app) {
@@ -67,38 +55,11 @@ module.exports = function (app) {
     target: 'http://localhost:8888'
   }))
 
-  app.get('*', function (req, res) {
+  app.get('*', function (req, res, next) {
     getTemplate()
       .then(template => {
-        const routerContext = {}
-        const stores = createStoreMap()
-        const ReactApp = serverBundle(stores, routerContext, req.url)
-        asyncBootstrap(ReactApp)
-          .then(() => {
-            const states = getStoreState(stores)
-            if (routerContext.url) {
-              res.status(302).setHeader('Location', routerContext.url)
-              res.end()
-              return
-            }
-            const helmet = Helmet.rewind()
-            const content = ReactSSR.renderToString(ReactApp)
-            const html = ejs.render(template, {
-              appString: content,
-              initialState: serialize(states),
-              title: helmet.title.toString(),
-              meta: helmet.meta.toString(),
-              style: helmet.style.toString(),
-              link: helmet.link.toString()
-            })
-            res.send(html)
-          })
-          .catch(err => {
-            console.error(err)
-          })
+        return serverRender(serverBundle, template, req, res)
       })
-      .catch(err => {
-        console.error(err)
-      })
+      .catch(next)
   })
 }
