@@ -7,7 +7,6 @@ import {
 import TopicList from '../views/topic-list/index'
 import TopicDetail from '../views/topic-detail/index'
 import App from '../views/App'
-import Test from '../views/test/index'
 
 export default class Routers extends Component {
   componentDidMount() {
@@ -21,7 +20,6 @@ export default class Routers extends Component {
           <Route path="/" render={() => <Redirect to="/list" />} exact />
           <Route path="/list" component={TopicList} />
           <Route path="/detail" component={TopicDetail} />
-          <Route path="/test" component={Test} />
         </Switch>
       </App>
     )

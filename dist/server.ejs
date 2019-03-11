@@ -4,15 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <%- meta %>
-  <%- title %>
-  <%- link %>
-  <%- style %>
+  <%%- meta %>
+  <%%- title %>
+  <%%- link %>
+  <%%- style %>
+  <style>
+    <%%- materialStyle %>
+  </style>
 </head>
 <body>
-  <div id="root"><%- appString %></div>
+  <div id="root"><%%- appString %></div>
   <script>
-    window.__INITIAL__STATE__ = <%- initialState%>
+    window.__INITIAL__STATE__ = <%%- initialState%>
   </script>
-<script type="text/javascript" src="/public/app.50ae85f13494b5cf0aa9.js"></script></body>
+</body>
 </html>

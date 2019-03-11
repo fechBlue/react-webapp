@@ -5,16 +5,29 @@ import {
 } from 'mobx-react'
 import { Helmet } from 'react-helmet'
 import PropType from 'prop-types'
+import Tabs from '@material-ui/core/Tabs'
+import Tab from '@material-ui/core/Tab'
 import AppState from '../../store/app.state'
+import Container from '../layout/container'
 
 @inject('appState') @observer
 class TopicList extends Component {
+  state = {
+    tabValue: 0,
+  }
+
   componentDidMount() {
     // do something here
   }
 
   changeName = (event) => {
     this.props.appState.changeName(event.target.value)
+  }
+
+  changeTab = (event, value) => {
+    this.setState({
+      tabValue: value,
+    })
   }
 
   bootstrap = () => {
@@ -27,17 +40,25 @@ class TopicList extends Component {
   }
 
   render() {
-    const { appState } = this.props
-
+    const { tabValue } = this.state
     return (
-      <div>
+      <Container>
         <Helmet>
           <title>this is a topiclist page.</title>
           <meta name="topicList" description="666" />
         </Helmet>
-        <input type="text" onChange={this.changeName} />
-        {appState.msg}
-      </div>
+        <Tabs
+          value={tabValue}
+          onChange={this.changeTab}
+        >
+          <Tab label="全部" />
+          <Tab label="分享" />
+          <Tab label="工作" />
+          <Tab label="问答" />
+          <Tab label="精品" />
+          <Tab label="测试" />
+        </Tabs>
+      </Container>
     )
   }
 }

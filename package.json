@@ -24,6 +24,8 @@
   },
   "homepage": "https://github.com/fechBlue/react-webapp#readme",
   "dependencies": {
+    "@material-ui/core": "^3.9.2",
+    "@material-ui/icons": "^3.0.2",
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "ejs": "^2.6.1",
@@ -31,6 +33,7 @@
     "express": "^4.16.4",
     "express-session": "^1.15.6",
     "history": "^4.7.2",
+    "jss": "^9.8.7",
     "mobx": "^5.9.0",
     "mobx-react": "^5.4.3",
     "prop-types": "^15.7.2",
@@ -39,6 +42,7 @@
     "react-async-bootstrapper": "^2.1.1",
     "react-dom": "^16.8.3",
     "react-helmet": "^5.2.0",
+    "react-jss": "^8.6.1",
     "react-router-dom": "^4.3.1",
     "serialize-javascript": "^1.6.1",
     "webpack": "^4.29.5"
@@ -69,7 +73,7 @@
     "husky": "^1.3.1",
     "memory-fs": "^0.4.1",
     "nodemon": "^1.18.10",
-    "react-hot-loader": "^4.7.1",
+    "react-hot-loader": "^4.8.0",
     "serve-favicon": "^2.5.0",
     "webpack-cli": "^3.2.3",
     "webpack-dev-server": "^3.2.1",
